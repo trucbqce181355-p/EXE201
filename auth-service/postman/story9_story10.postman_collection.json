@@ -1,0 +1,348 @@
+{
+  "info": {
+    "_postman_id": "658c3937-9dfa-46fc-bf30-a6fe160e742d",
+    "name": "Auth Service - Story 9 and Story 10",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "LOGIN - Baseline",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.accessToken) { pm.environment.set('token', json.accessToken); pm.environment.set('oldToken', json.accessToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{oldPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "LOGIN - New Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.accessToken) { pm.environment.set('newToken', json.accessToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Story 9 - Update Account",
+      "item": [
+        {
+          "name": "UA01 - Valid Update",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA03 - No Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA05 - Invalid Phone",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"abc\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA06 - Full Name Too Long",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA07 - Invalid Avatar URL",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"abc\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA08 - Missing Full Name",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA09 - Missing Phone",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA10 - Missing Avatar URL",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA11 - Forbidden Fields Ignored",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\",\n  \"email\": \"hack@example.com\",\n  \"username\": \"hack-user\",\n  \"status\": \"LOCKED\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Story 10 - Forgot Password",
+      "item": [
+        {
+          "name": "FP01 - Existing Email",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/request"
+          }
+        },
+        {
+          "name": "FP02 - Non-existing Email",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{nonExistingEmail}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/request"
+          }
+        },
+        {
+          "name": "FP03 - Invalid Email Format",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"abc\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/request"
+          }
+        },
+        {
+          "name": "FP04 - Empty Email",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/request"
+          }
+        },
+        {
+          "name": "FP05 - Rate Limit (Run This After 3 Same Requests)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{rateLimitEmail}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/request"
+          }
+        },
+        {
+          "name": "FP07 - Valid Reset",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP08 - Invalid Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{invalidToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP09 - Expired Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{expiredResetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP10 - Used Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"Different@123\",\n  \"confirmPassword\": \"Different@123\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP11 - Confirm Password Mismatch",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"Mismatch@123\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP12 - Password Too Short",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"Ab@12\",\n  \"confirmPassword\": \"Ab@12\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP17 - Same As Current Password",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP18 - Missing Email",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP19 - Missing Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP20 - Missing New Password",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP21 - Missing Confirm Password",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP22 - Login With Old Password",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{oldPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "FP23 - Login With New Password",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "FP24 - Old Access Token Invalid After Reset",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{oldToken}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"After Reset\",\n  \"phone\": \"+84901234568\",\n  \"avatarUrl\": \"https://example.com/b.jpg\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        }
+      ]
+    }
+  ]
+}

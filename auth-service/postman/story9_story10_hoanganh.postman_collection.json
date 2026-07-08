@@ -1,0 +1,1360 @@
+﻿{
+    "info":  {
+                 "_postman_id":  "4f8cecb8-986f-4daa-a900-30fe4906173d",
+                 "name":  "Auth Service - Story 9 10 - Hoang Anh",
+                 "description":  "Backend test cases for Story 9 and Story 10 using hoanganh2005 / sasakihasei123@gmail.com. Requests using resetToken, expiredResetToken, or secondResetToken require manual token input from email or application logs.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "item":  [
+                 {
+                     "name":  "Setup",
+                     "item":  [
+                                  {
+                                      "name":  "LOGIN - Baseline",
+                                      "request":  {
+                                                      "description":  "Login with the seeded password 123456. Saves token and oldToken.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{oldPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/auth/login"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "var json = pm.response.json();",
+                                                                                    "if (json.accessToken) { pm.environment.set(\u0027token\u0027, json.accessToken); pm.environment.set(\u0027oldToken\u0027, json.accessToken); }"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "LOGIN - New Password",
+                                      "request":  {
+                                                      "description":  "Run after a successful password reset. Saves newToken.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/auth/login"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "var json = pm.response.json();",
+                                                                                    "if (json.accessToken) { pm.environment.set(\u0027newToken\u0027, json.accessToken); }"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Story 9 - Update Account",
+                     "item":  [
+                                  {
+                                      "name":  "UA01 - Valid Update",
+                                      "request":  {
+                                                      "description":  "Expected 200.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA02 - Valid Update Alternate Values",
+                                      "request":  {
+                                                      "description":  "Expected 200 with alternate values.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{alternateFullName}}\",\n  \"phone\": \"{{alternatePhone}}\",\n  \"avatarUrl\": \"{{alternateAvatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA03 - No Token",
+                                      "request":  {
+                                                      "description":  "Expected 401 or 403.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA04 - Invalid Bearer Token",
+                                      "request":  {
+                                                      "description":  "Expected 401.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{invalidBearerToken}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA05 - Invalid Phone",
+                                      "request":  {
+                                                      "description":  "Expected 400 Invalid phone format.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"abc\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA06 - Full Name Too Long",
+                                      "request":  {
+                                                      "description":  "Expected 400 Full name too long.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA07 - Invalid Avatar URL",
+                                      "request":  {
+                                                      "description":  "Expected 400 Invalid URL format.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"abc\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA08 - Missing Full Name",
+                                      "request":  {
+                                                      "description":  "Expected 400 Full name is required.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA09 - Missing Phone",
+                                      "request":  {
+                                                      "description":  "Expected 400 Phone is required.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA10 - Missing Avatar URL",
+                                      "request":  {
+                                                      "description":  "Expected 400 Avatar URL is required.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA11 - Forbidden Fields Ignored",
+                                      "request":  {
+                                                      "description":  "Expected 200; forbidden fields must not change.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\",\n  \"email\": \"hack@example.com\",\n  \"username\": \"hack-user\",\n  \"status\": \"LOCKED\",\n  \"password\": \"Some@123\",\n  \"roles\": [\"ADMIN\"]\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA12 - Full Name Blank Spaces",
+                                      "request":  {
+                                                      "description":  "Expected 400 Full name is required.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"   \",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA13 - Phone Blank Spaces",
+                                      "request":  {
+                                                      "description":  "Expected 400 Phone is required.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"   \",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA14 - Avatar URL Blank Spaces",
+                                      "request":  {
+                                                      "description":  "Expected 400 Avatar URL is required.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"   \"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA15 - Avatar URL Too Long",
+                                      "request":  {
+                                                      "description":  "Expected 400 Avatar URL too long.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpg\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA16 - Locked Account (Set user.status=LOCKED First)",
+                                      "request":  {
+                                                      "description":  "Manual DB prep required. Expected 400 Cannot update a locked or inactive account.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "UA17 - Inactive Account (Set user.status=INACTIVE First)",
+                                      "request":  {
+                                                      "description":  "Manual DB prep required. Expected 400 Cannot update a locked or inactive account.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Story 10 - Request Reset",
+                     "item":  [
+                                  {
+                                      "name":  "FP01 - Existing Email",
+                                      "request":  {
+                                                      "description":  "Expected 200 Reset link sent to email.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/request"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP02 - Non-existing Email",
+                                      "request":  {
+                                                      "description":  "Expected 200 with the same generic message.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{nonExistingEmail}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/request"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP03 - Invalid Email Format",
+                                      "request":  {
+                                                      "description":  "Expected 400 Invalid email format.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"abc\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/request"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP04 - Empty Email",
+                                      "request":  {
+                                                      "description":  "Expected 400 Email is required.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/request"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP05 - Rate Limit (Run After 3 Same Requests)",
+                                      "request":  {
+                                                      "description":  "Run this as the 4th request for the same rateLimitEmail. Expected 429.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{rateLimitEmail}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/request"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP06 - Existing Email Uppercase And Spaces",
+                                      "request":  {
+                                                      "description":  "Expected 200. Verifies email normalization works.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"  SASAKIHASEI123@GMAIL.COM  \"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/request"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Story 10 - Reset Password",
+                     "item":  [
+                                  {
+                                      "name":  "FP07 - Valid Reset",
+                                      "request":  {
+                                                      "description":  "Set {{resetToken}} manually from email or logs first. Expected 200.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP08 - Invalid Token",
+                                      "request":  {
+                                                      "description":  "Expected 400 Invalid reset link.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{invalidToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP09 - Expired Token",
+                                      "request":  {
+                                                      "description":  "Set {{expiredResetToken}} manually, then expire it in DB before running. Expected 400.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{expiredResetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP10 - Used Token",
+                                      "request":  {
+                                                      "description":  "Run after FP07 succeeds with the same resetToken. Expected 400.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{alternateNewPassword}}\",\n  \"confirmPassword\": \"{{alternateNewPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP11 - Confirm Password Mismatch",
+                                      "request":  {
+                                                      "description":  "Expected 400 Passwords do not match.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"Mismatch@123\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP12 - Password Too Short",
+                                      "request":  {
+                                                      "description":  "Expected 400 password policy error.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"Ab@12\",\n  \"confirmPassword\": \"Ab@12\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP13 - Missing Uppercase",
+                                      "request":  {
+                                                      "description":  "Expected 400 password policy error.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"abc@1234\",\n  \"confirmPassword\": \"abc@1234\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP14 - Missing Lowercase",
+                                      "request":  {
+                                                      "description":  "Expected 400 password policy error.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"ABC@1234\",\n  \"confirmPassword\": \"ABC@1234\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP15 - Missing Number",
+                                      "request":  {
+                                                      "description":  "Expected 400 password policy error.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"Abc@defg\",\n  \"confirmPassword\": \"Abc@defg\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP16 - Missing Special Character",
+                                      "request":  {
+                                                      "description":  "Expected 400 password policy error.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"Abc12345\",\n  \"confirmPassword\": \"Abc12345\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP17 - Same As Current Password",
+                                      "request":  {
+                                                      "description":  "Expected 400 New password must be different from current password.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{oldPassword}}\",\n  \"confirmPassword\": \"{{oldPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP18 - Missing Email",
+                                      "request":  {
+                                                      "description":  "Expected 400 Email is required.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP19 - Missing Token",
+                                      "request":  {
+                                                      "description":  "Expected 400 Token is required.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP20 - Missing New Password",
+                                      "request":  {
+                                                      "description":  "Expected 400 New password is required.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP21 - Missing Confirm Password",
+                                      "request":  {
+                                                      "description":  "Expected 400 Confirm password is required.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP25 - Second Token Invalid After First Token Succeeds",
+                                      "request":  {
+                                                      "description":  "Request forgot password twice, store the second token in {{secondResetToken}}, use the first token successfully, then run this. Expected 400.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{secondResetToken}}\",\n  \"newPassword\": \"{{alternateNewPassword}}\",\n  \"confirmPassword\": \"{{alternateNewPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP26 - Token Does Not Belong To Submitted Email",
+                                      "request":  {
+                                                      "description":  "Use a valid resetToken for {{testEmail}} but submit {{otherExistingEmail}}. Expected 400 Invalid reset link.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{otherExistingEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/forgot-password/reset"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Story 10 - After Reset",
+                     "item":  [
+                                  {
+                                      "name":  "FP22 - Login With Old Password",
+                                      "request":  {
+                                                      "description":  "Run after FP07 succeeds. Expected login failure.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{oldPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/auth/login"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "FP23 - Login With New Password",
+                                      "request":  {
+                                                      "description":  "Run after FP07 succeeds. Expected 200 and newToken saved.",
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/auth/login"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "var json = pm.response.json();",
+                                                                                    "if (json.accessToken) { pm.environment.set(\u0027newToken\u0027, json.accessToken); }"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "FP24 - Old Access Token Invalid After Reset",
+                                      "request":  {
+                                                      "description":  "Run after FP07 succeeds. Expected 401 Token expired.",
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{oldToken}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"fullName\": \"After Reset\",\n  \"phone\": \"{{alternatePhone}}\",\n  \"avatarUrl\": \"{{alternateAvatarUrl}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "url":  "{{baseUrl}}/api/accounts/me"
+                                                  }
+                                  }
+                              ]
+                 }
+             ]
+}

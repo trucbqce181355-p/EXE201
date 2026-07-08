@@ -1,0 +1,8 @@
+# Copy this file to auth-service/application-local.properties on your own machine.
+# This file is ignored by git and should never contain shared secrets in the repo.
+
+# Gmail account used to send forgot-password emails
+app.mail.username=your-group-mail@gmail.com
+
+# Gmail App Password (16 characters), not your normal Gmail password
+app.mail.password=replace-with-your-app-password

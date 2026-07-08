@@ -1,0 +1,288 @@
+{
+  "info": {
+    "_postman_id": "7d4ea3c4-d84f-4f13-bf8e-f8a8fd9e5b11",
+    "name": "Auth Service - Story 9 10 - Hoang Anh Demo",
+    "description": "Short demo flow for Story 9 and Story 10 using hoanganh2005 / sasakihasei123@gmail.com. For reset password, run the request reset step first, then paste the token from email or application log into the resetToken environment variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "LOGIN - Baseline",
+          "request": {
+            "description": "Login with the seeded password 123456. Saves token and oldToken.",
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{oldPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "  pm.environment.set('token', json.accessToken);",
+                  "  pm.environment.set('oldToken', json.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Story 9 - Demo",
+      "item": [
+        {
+          "name": "UA01 - Valid Update",
+          "request": {
+            "description": "Expected 200. Updates the seeded account profile.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "type": "string",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "UA02 - Verify Update With Second PUT",
+          "request": {
+            "description": "Expected 200. Sends another valid update to confirm the authenticated account can still be updated.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "type": "string",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{alternateFullName}}\",\n  \"phone\": \"{{alternatePhone}}\",\n  \"avatarUrl\": \"{{alternateAvatarUrl}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Story 10 - Demo",
+      "item": [
+        {
+          "name": "FP01 - Request Reset Link",
+          "request": {
+            "description": "Expected 200. Sends a password reset link to the seeded email.",
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/request"
+          }
+        },
+        {
+          "name": "FP07 - Reset Password With Token",
+          "request": {
+            "description": "Expected 200. Before running, paste the token from email or logs into the resetToken environment variable.",
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/accounts/forgot-password/reset"
+          }
+        },
+        {
+          "name": "FP23 - Login With New Password",
+          "request": {
+            "description": "Expected 200 after a successful password reset. Saves newToken.",
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.accessToken) { pm.environment.set('newToken', json.accessToken); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FP24 - Old Token Is Rejected",
+          "request": {
+            "description": "Expected 401 after password reset. Reuses the old token on PUT /api/accounts/me.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "type": "string",
+                  "value": "{{oldToken}}"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{alternateFullName}}\",\n  \"phone\": \"{{alternatePhone}}\",\n  \"avatarUrl\": \"{{alternateAvatarUrl}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        },
+        {
+          "name": "FP24B - New Token Works",
+          "request": {
+            "description": "Expected 200 after password reset. Uses the new token on PUT /api/accounts/me.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "type": "string",
+                  "value": "{{newToken}}"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{fullName}}\",\n  \"phone\": \"{{phone}}\",\n  \"avatarUrl\": \"{{avatarUrl}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/accounts/me"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Copy this file to application-local.properties for machine-specific overrides.
+spring.datasource.url=jdbc:mysql://localhost:3306/customer_db?zeroDateTimeBehavior=convertToNull
+spring.datasource.username=root
+spring.datasource.password=123456
+
+app.security.allowed-origin=http://localhost:5173
+app.security.jwt.secret=cfsc_group1_auth_service_secret_key_min_32_chars_for_hs256_2026_change_in_production
