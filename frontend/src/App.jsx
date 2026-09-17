@@ -35,6 +35,8 @@ import ContactManage from "./pages/ContactManage";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminRoute from "./routes/AdminRoute";
 import LoyaltyManage from "./pages/LoyaltyManage";
+import AdminOrderManagement from "./pages/AdminOrderManagement";
+import PaymentResult from "./pages/PaymentResult";
 
 
 
@@ -62,6 +64,7 @@ function App() {
         {/* Customer & Orders */}
         <Route path="/order-history" element={<OrderHistory />} />
         <Route path="/order-detail/:orderId" element={<OrderDetail />} />
+        <Route path="/payment/vnpay/return" element={<PaymentResult />} />
         <Route path="/customers/:customerId" element={<CustomerProfilePage />} />
         <Route path="/loyalty/redeem" element={<RedeemPage />} />
         <Route path="/cart" element={<CartPage />} />
@@ -97,6 +100,7 @@ function App() {
           <Route path="coupons" element={<Coupon />} />
           <Route path="permissions" element={<Permission />} />
           <Route path="coupons" element={<Coupon />} />
+          <Route path="orders" element={<AdminOrderManagement />} />
           <Route path="categories" element={<CategoryPage />} />
           <Route path="products" element={<ProductPage />} />
           <Route path="tags" element={<TagManage />} />

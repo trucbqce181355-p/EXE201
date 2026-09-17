@@ -11,7 +11,7 @@ const fallbackProducts = [
         name: "Cảm biến BeAn",
         sku: "BEAN-SEN-01",
         price: 350000,
-        description: "Cảm biến hồng ngoại kết hợp cảm biến radar thông minh phát hiện chuyển động trong xe cực kỳ nhạy bén.",
+        description: "Cảm biến hồng ngoại kết hợp cảm biến radar thông minh phát hiện chuyển động trong xe .",
         preparationTime: 5,
         available: true,
         category: { name: "Cảm biến" },
@@ -22,13 +22,13 @@ const fallbackProducts = [
     },
     {
         id: 9902,
-        name: "Bộ điều khiển BeAn",
+        name: "Cảm biến BeAn",
         sku: "BEAN-CON-02",
         price: 1200000,
         description: "Điều khiển trung tâm xử lý dữ liệu từ tất cả cảm biến và cảnh báo khẩn cấp qua ứng dụng di động.",
         preparationTime: 10,
         available: true,
-        category: { name: "Bộ điều khiển" },
+        category: { name: "Cảm biến" },
         images: [{ id: 2, imageUrl: "images/menu-2.png", isPrimary: true }],
         status: "ACTIVE",
         averageRating: 4.9,
@@ -36,13 +36,13 @@ const fallbackProducts = [
     },
     {
         id: 9903,
-        name: "Còi cảnh báo BeAn",
+        name: "Cảm biến BeAn",
         sku: "BEAN-ALA-03",
         price: 250000,
-        description: "Còi cảnh báo âm lượng 120dB kích hoạt ngay lập tức khi phát hiện có sự cố ngoài ý muốn.",
+        description: "Cảm biến kích hoạt ngay lập tức khi phát hiện có sự cố ngoài ý muốn.",
         preparationTime: 5,
         available: true,
-        category: { name: "Còi báo động" },
+        category: { name: "Cảm biến" },
         images: [{ id: 3, imageUrl: "images/menu-3.png", isPrimary: true }],
         status: "ACTIVE",
         averageRating: 4.7,
@@ -172,13 +172,13 @@ const PublicProductDetailPage = () => {
         "images/menu-6.png"
     ];
     const defaultPlaceholder = placeholders[(product.id || 0) % placeholders.length];
-    const primaryImage = product.images?.find((img: any) => img.isPrimary)?.imageUrl 
-                       || product.images?.[0]?.imageUrl 
-                       || defaultPlaceholder;
+    const primaryImage = product.images?.find((img: any) => img.isPrimary)?.imageUrl
+        || product.images?.[0]?.imageUrl
+        || defaultPlaceholder;
 
     return (
         <div style={{ backgroundColor: "#fbf8f6", minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
-            
+
             {/* Nav Header */}
             <header className="header" style={{ position: "sticky", top: 0, zIndex: 1000, backgroundColor: "#fff", borderBottom: "1px solid #efebe9", padding: "15px 7%" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -193,13 +193,13 @@ const PublicProductDetailPage = () => {
             </header>
 
             <div className="container" style={{ maxWidth: "1200px", margin: "40px auto", padding: "0 20px" }}>
-                
+
                 {/* Back Link */}
-                <button 
-                    onClick={() => navigate("/")} 
+                <button
+                    onClick={() => navigate("/")}
                     style={{
-                        background: "none", border: "none", color: "#5d4037", 
-                        cursor: "pointer", display: "flex", alignItems: "center", 
+                        background: "none", border: "none", color: "#5d4037",
+                        cursor: "pointer", display: "flex", alignItems: "center",
                         gap: "8px", fontWeight: "bold", marginBottom: "25px", fontSize: "16px"
                     }}
                 >
@@ -208,13 +208,13 @@ const PublicProductDetailPage = () => {
 
                 {/* Main Product Panel */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "40px", backgroundColor: "#fff", borderRadius: "15px", padding: "40px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-                    
+
                     {/* Left: Product Images */}
                     <div style={{ flex: "1 1 450px", textAlign: "center" }}>
-                        <img 
-                            src={primaryImage} 
-                            alt={product.name} 
-                            style={{ maxWidth: "100%", maxHeight: "400px", borderRadius: "10px", objectFit: "cover", boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }} 
+                        <img
+                            src={primaryImage}
+                            alt={product.name}
+                            style={{ maxWidth: "100%", maxHeight: "400px", borderRadius: "10px", objectFit: "cover", boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
                         />
                         {product.images && product.images.length > 1 && (
                             <div style={{ display: "flex", gap: "10px", marginTop: "15px", justifyContent: "center" }}>
@@ -239,7 +239,7 @@ const PublicProductDetailPage = () => {
                                 )}
                             </div>
                             <h1 style={{ color: "#3e2723", fontSize: "32px", fontWeight: "bold", marginTop: "10px", marginBottom: "5px" }}>{product.name}</h1>
-                            
+
                             {product.averageRating > 0 && (
                                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                                     {renderStars(product.averageRating)}
@@ -280,19 +280,19 @@ const PublicProductDetailPage = () => {
                         {product.available ? (
                             <div style={{ display: "flex", alignItems: "center", gap: "20px", marginTop: "10px", flexWrap: "wrap" }}>
                                 <div style={{ display: "inline-flex", border: "1px solid #bcaaa4", borderRadius: "8px", overflow: "hidden" }}>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setQuantity(q => Math.max(1, q - 1))} 
+                                    <button
+                                        type="button"
+                                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
                                         style={{ border: "none", backgroundColor: "#fff", width: "40px", height: "40px", fontSize: "18px", cursor: "pointer", color: "#5d4037" }}
                                     >-</button>
                                     <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "40px", fontWeight: "bold" }}>{quantity}</span>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setQuantity(q => q + 1)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => setQuantity(q => q + 1)}
                                         style={{ border: "none", backgroundColor: "#fff", width: "40px", height: "40px", fontSize: "18px", cursor: "pointer", color: "#5d4037" }}
                                     >+</button>
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleAddToCart}
                                     disabled={loadingCart}
                                     style={{
@@ -320,14 +320,14 @@ const PublicProductDetailPage = () => {
                     <form onSubmit={handleSubmitReview} style={{ marginBottom: "30px", backgroundColor: "#fdfbf7", padding: "20px", borderRadius: "10px", border: "1px solid #efebe9" }}>
                         <h4 style={{ color: "#5d4037", marginBottom: "15px" }}>Viết đánh giá của bạn</h4>
                         {reviewError && <p style={{ color: "#dc3545", marginBottom: "15px" }}>{reviewError}</p>}
-                        
+
                         <div style={{ display: "flex", alignItems: "center", gap: "15px", marginBottom: "15px" }}>
                             <span>Số sao:</span>
                             <div style={{ display: "flex", gap: "5px" }}>
                                 {[1, 2, 3, 4, 5].map((star) => (
-                                    <span 
-                                        key={star} 
-                                        onClick={() => setRating(star)} 
+                                    <span
+                                        key={star}
+                                        onClick={() => setRating(star)}
                                         style={{ cursor: "pointer", color: star <= rating ? "#ffc107" : "#e4e5e9", fontSize: "1.5rem" }}
                                     >
                                         ★
@@ -336,7 +336,7 @@ const PublicProductDetailPage = () => {
                             </div>
                         </div>
 
-                        <textarea 
+                        <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             placeholder="Nhập nhận xét của bạn về sản phẩm..."
@@ -344,8 +344,8 @@ const PublicProductDetailPage = () => {
                             style={{ width: "100%", height: "100px", padding: "10px", borderRadius: "5px", border: "1px solid #ccc", marginBottom: "15px", fontFamily: "inherit" }}
                         />
 
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={submittingReview}
                             style={{ border: "none", backgroundColor: "#5d4037", color: "#fff", padding: "10px 20px", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}
                         >

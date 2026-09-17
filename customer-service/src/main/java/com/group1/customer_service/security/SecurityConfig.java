@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/contacts")
                         .permitAll()
+                        .requestMatchers("/api/payment/**").permitAll()
 
                         
                         .requestMatchers("/customers/*/loyalty/**").authenticated()

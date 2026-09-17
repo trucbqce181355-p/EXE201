@@ -1,6 +1,8 @@
 package com.group1.customer_service.controller;
 
+import com.group1.customer_service.dto.request.CancelOrderRequest;
 import com.group1.customer_service.dto.request.CreateOrderRequest;
+import com.group1.customer_service.dto.request.UpdateOrderStatusRequest;
 import com.group1.customer_service.dto.response.ApiResponse;
 import com.group1.customer_service.dto.response.OrderDetailResponse;
 import com.group1.customer_service.dto.response.OrderResponse;
@@ -53,5 +55,33 @@ public class OrderController {
 
         OrderDetailResponse data = orderService.getOrderDetail(customerId, orderId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Order details fetched successfully", data));
+    }
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> updateOrderStatus(
+            @PathVariable Long customerId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody UpdateOrderStatusRequest request) {
+
+        OrderDetailResponse data = orderService.updateOrderStatus(customerId, orderId, request.getNewStatus(), request.getNote());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Order status updated successfully", data));
+    }
+
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> cancelOrder(
+            @PathVariable Long customerId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody CancelOrderRequest request) {
+
+        OrderDetailResponse data = orderService.cancelOrder(customerId, orderId, request.getReason());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Order cancelled successfully", data));
+    }
+
+    @PutMapping("/{orderId}/pay")
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> processPayment(
+            @PathVariable Long customerId,
+            @PathVariable Long orderId) {
+
+        OrderDetailResponse data = orderService.processPayment(customerId, orderId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Payment processed successfully", data));
     }
 }

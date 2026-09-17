@@ -123,6 +123,7 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
         } catch (Exception ex) {
             log.warn("Failed to send register OTP to {}. OTP for testing: {}", toEmail, otp);
+            log.error("Email sending exception: ", ex);
             return;
         }
 

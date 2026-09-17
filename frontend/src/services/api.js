@@ -244,6 +244,17 @@ export const contactApi = {
 // =============================
 // 5. LOYALTY, ENGAGEMENT & PROMOTION API (Port 8083)
 // =============================
+export const dailyPostApi = {
+  createPost: async (payload) => {
+    const res = await apiEngagement.post("/api/daily-posts", payload);
+    return res.data;
+  },
+  getAllPosts: async () => {
+    const res = await apiEngagement.get("/api/daily-posts");
+    return res.data;
+  }
+};
+
 export const loyaltyApi = {
   getLoyaltyInfo: async (customerId) => {
     const res = await apiEngagement.get(`/customer/${customerId}/loyalty`);

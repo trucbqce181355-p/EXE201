@@ -87,6 +87,65 @@ const OrderDetail: React.FC = () => {
         if (orderId) fetchOrderDetail();
     }, [orderId, navigate]);
 
+    const handlePayOrder = async () => {
+        if (!order) return;
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
+
+        try {
+            const response = await axios.get(`${API_BASE_URL}/api/payment/vnpay/create-url?orderId=${order.orderId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (response.data.success && response.data.data) {
+                // Redirect user to VNPay
+                window.location.href = response.data.data;
+            } else {
+                toast.error("Không thể tạo URL thanh toán");
+            }
+        } catch (error) {
+            console.error("Error creating VNPay URL:", error);
+            toast.error("Thanh toán thất bại, vui lòng thử lại!");
+        }
+    };
+
+    const handleCancelOrder = async () => {
+        const reason = prompt("Lý do hủy đơn hàng:");
+        if (!reason) return;
+        
+        const token = localStorage.getItem('accessToken');
+        const payload = JSON.parse(atob(token!.split(".")[1]));
+        const customerResp = await customerApi.getByUserId(payload.userId);
+        const customerId = customerResp?.id || customerResp?.data?.id;
+
+        try {
+            await axios.put(`${API_BASE_URL}/customer/${customerId}/orders/${orderId}/cancel`, { reason }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert('Hủy đơn hàng thành công!');
+            window.location.reload();
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Lỗi hủy đơn');
+        }
+    };
+
+    const handleUpdateStatus = async (newStatus: string) => {
+        const token = localStorage.getItem('accessToken');
+        const payload = JSON.parse(atob(token!.split(".")[1]));
+        const customerResp = await customerApi.getByUserId(payload.userId);
+        const customerId = customerResp?.id || customerResp?.data?.id;
+
+        try {
+            await axios.put(`${API_BASE_URL}/customer/${customerId}/orders/${orderId}/status`, { newStatus, note: 'Update for testing' }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert(`Cập nhật trạng thái thành ${newStatus} thành công!`);
+            window.location.reload();
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Lỗi cập nhật trạng thái');
+        }
+    };
+
     if (loading) {
         return (
             <div className="account-page">
@@ -122,9 +181,12 @@ const OrderDetail: React.FC = () => {
             case 'Completed': return 'Hoàn thành';
             case 'Cancelled': return 'Đã hủy';
             case 'Processing': return 'Đang xử lý';
+            case 'Shipped': return 'Đang giao hàng';
             default: return status;
         }
     };
+
+    const currentStatus = [...order.statusHistory].sort((a,b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()).pop()?.status || 'Pending';
 
     return (
         <div className="account-page">
@@ -151,6 +213,34 @@ const OrderDetail: React.FC = () => {
                             <span style={{ fontSize: '1.6rem', color: '#888' }}>
                                 Đặt lúc: {order.statusHistory.length > 0 ? formatDate(order.statusHistory[0].updatedAt) : 'N/A'}
                             </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+                            {order.paymentInfo.status === 'PENDING' && currentStatus !== 'Cancelled' && (
+                                <button onClick={handlePayOrder} className="link-btn" style={{ background: '#2e7d32', color: 'white' }}>
+                                    <i className="fas fa-money-bill-wave"></i> Thanh toán ngay
+                                </button>
+                            )}
+                            {(currentStatus === 'Pending' || currentStatus === 'Processing') && (
+                                <button onClick={handleCancelOrder} className="link-btn" style={{ background: '#c62828', color: 'white' }}>
+                                    <i className="fas fa-times"></i> Hủy đơn hàng
+                                </button>
+                            )}
+                            {/* For Testing Status Updates */}
+                            {currentStatus !== 'Completed' && currentStatus !== 'Cancelled' && (
+                                <>
+                                    <button onClick={() => handleUpdateStatus('Processing')} className="link-btn" style={{ background: '#f57c00', color: 'white' }}>
+                                        Processing
+                                    </button>
+                                    <button onClick={() => handleUpdateStatus('Shipped')} className="link-btn" style={{ background: '#0277bd', color: 'white' }}>
+                                        Shipped
+                                    </button>
+                                    <button onClick={() => handleUpdateStatus('Completed')} className="link-btn" style={{ background: '#388e3c', color: 'white' }}>
+                                        Completed
+                                    </button>
+                                </>
+                            )}
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>

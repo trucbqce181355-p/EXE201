@@ -183,10 +183,15 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Product product = getProductEntity(id);
-        product.setDeleted(true);
-        product.setAvailable(false);
-        product.setStatus(ProductStatus.ARCHIVED);
-        productRepository.save(product);
+
+        // Delete related entities to prevent foreign key constraint violations
+        reviewRepository.deleteAll(reviewRepository.findByProductIdOrderByCreatedAtDesc(id));
+        productImageRepository.deleteAll(product.getImages());
+        productAvailabilityRepository.deleteAll(product.getFranchiseAvailabilities());
+        product.getTags().clear();
+
+        // Physically delete from the database
+        productRepository.delete(product);
     }
 
     @Override

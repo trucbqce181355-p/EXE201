@@ -41,6 +41,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
+    private final com.group1.customer_service.repository.AddressOrderRepository addressOrderRepository;
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PageResponse<OrderResponse> getOrders(
@@ -173,6 +174,29 @@ public class OrderService {
             Customer customer = customerRepository.findById(customerId)
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
 
+            // Auto-save new address to profile if it doesn't exist
+            if (request.getAddress() != null && !request.getAddress().trim().isEmpty()) {
+                String inputAddress = request.getAddress().trim();
+                boolean addressExists = false;
+                if (customer.getAddressOrders() != null) {
+                    for (com.group1.customer_service.entity.AddressOrder addr : customer.getAddressOrders()) {
+                        if (inputAddress.equalsIgnoreCase(addr.getAddressLine())) {
+                            addressExists = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!addressExists) {
+                    com.group1.customer_service.entity.AddressOrder newAddress = com.group1.customer_service.entity.AddressOrder.builder()
+                            .customer(customer)
+                            .addressLine(inputAddress)
+                            .isDefault(customer.getAddressOrders() == null || customer.getAddressOrders().isEmpty())
+                            .build();
+                    addressOrderRepository.save(newAddress);
+                }
+            }
+
             BigDecimal totalAmount = BigDecimal.ZERO;
             for (var reqItem : request.getItems()) {
                 BigDecimal itemTotal = reqItem.getPrice().multiply(BigDecimal.valueOf(reqItem.getQuantity()));
@@ -251,4 +275,141 @@ public class OrderService {
         }
     }
 
+    @Transactional
+    public OrderDetailResponse updateOrderStatus(Long customerId, Long orderId, String newStatus, String note) {
+        Order order = orderRepository.findOrderDetail(orderId, customerId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getStatus().equals("Cancelled")) {
+            throw new RuntimeException("Cannot update status of a cancelled order");
+        }
+
+        order.setStatus(newStatus);
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .order(order)
+                .status(newStatus)
+                .updatedAt(LocalDateTime.now())
+                .build();
+        
+        if (order.getStatusHistories() != null) {
+            order.getStatusHistories().add(history);
+        } else {
+            java.util.Set<OrderStatusHistory> histories = new java.util.LinkedHashSet<>();
+            histories.add(history);
+            order.setStatusHistories(histories);
+        }
+
+        orderRepository.save(order);
+        return getOrderDetail(customerId, orderId);
+    }
+
+    @Transactional
+    public OrderDetailResponse cancelOrder(Long customerId, Long orderId, String reason) {
+        Order order = orderRepository.findOrderDetail(orderId, customerId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getStatus().equals("Completed") || order.getStatus().equals("Shipped") || order.getStatus().equals("Cancelled")) {
+            throw new RuntimeException("Order cannot be cancelled in its current status: " + order.getStatus());
+        }
+
+        order.setStatus("Cancelled");
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .order(order)
+                .status("Cancelled")
+                .updatedAt(LocalDateTime.now())
+                .build();
+        
+        if (order.getStatusHistories() != null) {
+            order.getStatusHistories().add(history);
+        } else {
+            java.util.Set<OrderStatusHistory> histories = new java.util.LinkedHashSet<>();
+            histories.add(history);
+            order.setStatusHistories(histories);
+        }
+
+        orderRepository.save(order);
+        return getOrderDetail(customerId, orderId);
+    }
+
+    @Transactional
+    public OrderDetailResponse processPayment(Long customerId, Long orderId) {
+        Order order = orderRepository.findOrderDetail(orderId, customerId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderPayment payment = order.getPayment();
+        if (payment == null) {
+            throw new RuntimeException("No payment record found for this order");
+        }
+
+        if (payment.getStatus().equals("PAID")) {
+            throw new RuntimeException("Order is already paid");
+        }
+
+        payment.setStatus("PAID");
+        payment.setPaidAt(LocalDateTime.now());
+
+        orderRepository.save(order);
+        return getOrderDetail(customerId, orderId);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<com.group1.customer_service.dto.response.AdminOrderResponse> getAllOrdersAdmin(
+            int page, int limit, List<String> status, LocalDate fromDate, LocalDate toDate) {
+        try {
+            Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdAt").descending());
+            List<String> statusList = (status != null && !status.isEmpty()) ? status : null;
+
+            Page<Order> orders;
+            
+            if (statusList == null && fromDate == null && toDate == null) {
+                orders = orderRepository.findAll(pageable);
+            } else {
+                orders = orderRepository.filterAllOrders(
+                        statusList,
+                        fromDate != null ? fromDate.atStartOfDay() : null,
+                        toDate != null ? toDate.atTime(23, 59, 59) : null,
+                        pageable
+                );
+            }
+
+            List<com.group1.customer_service.dto.response.AdminOrderResponse> data = orders.getContent().stream()
+                    .map(o -> com.group1.customer_service.dto.response.AdminOrderResponse.builder()
+                            .orderId(o.getOrderId())
+                            .orderNumber(o.getOrderNumber())
+                            .status(o.getStatus())
+                            .totalAmount(o.getTotalAmount())
+                            .createdAt(o.getCreatedAt())
+                            .itemsCount(o.getItems() != null ? o.getItems().size() : 0)
+                            .customerId(o.getCustomer().getCustomerId())
+                            .customerName(o.getCustomer().getCustomerCode() != null ? o.getCustomer().getCustomerCode() : "Khách hàng")
+                            .paymentStatus(o.getPayment() != null ? o.getPayment().getStatus() : "UNKNOWN")
+                            .build())
+                    .toList();
+
+            return new PageResponse<>(data, orders.getTotalElements(), page, limit);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi hiển thị danh sách đơn hàng cho admin: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public OrderDetailResponse adminUpdateOrderStatus(Long orderId, String newStatus, String note) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getStatus().equals("Cancelled")) {
+            throw new RuntimeException("Cannot update status of a cancelled order");
+        }
+        order.setStatus(newStatus);
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .order(order).status(newStatus).updatedAt(LocalDateTime.now()).build();
+        if (order.getStatusHistories() != null) order.getStatusHistories().add(history);
+        else order.setStatusHistories(new java.util.LinkedHashSet<>(List.of(history)));
+
+        orderRepository.save(order);
+        return getOrderDetail(order.getCustomer().getCustomerId(), orderId);
+    }
 }

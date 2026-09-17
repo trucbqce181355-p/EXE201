@@ -164,9 +164,9 @@ const CartPage: React.FC = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCart(res.data);
-            
+
             const payload = JSON.parse(atob(token.split(".")[1]));
-            
+
             const resp = await customerApi.getByUserId(payload.userId);
             const cId = resp?.id || resp?.data?.id;
             fetchCartData(cId, token);
@@ -209,20 +209,57 @@ const CartPage: React.FC = () => {
             const profileResp = await customerApi.getCustomerProfile(cId, 'addresses');
             const profileData = profileResp?.data || profileResp;
 
-            const name = profileData?.full_name || profileData?.fullName || "Pham Duc Khang";
-            const phone = profileData?.phone || "0904567788";
-            const defaultAddress = profileData?.address || "15 Vo Van Tan, Ward 6, District 3, Ho Chi Minh City";
+            let localProfile: any = {};
+            try {
+                localProfile = JSON.parse(localStorage.getItem("accountProfile") || "{}");
+            } catch (e) { }
+
+            const name = profileData?.full_name || profileData?.fullName || localProfile?.fullName || localProfile?.username || "";
+            const phone = profileData?.phone || localProfile?.phone || "";
+            const defaultAddress = profileData?.address || localProfile?.address || "";
             const addresses = profileData?.addresses || [];
+
+            // Fallback: If no addresses in DB but user has a profile address, inject it so they can use it
+            if (addresses.length === 0 && defaultAddress && defaultAddress.trim() !== "") {
+                addresses.push({ addressLine: defaultAddress, isDefault: true });
+            }
 
             // Build address dropdown HTML beforehand to avoid nested template literal string parsing errors
             let addressSelectHtml = "";
+            let addressInputHtml = `
+                <div id="new-address-section" style="margin-top: 10px; display: none; padding: 15px; border: 1px dashed #ccc; border-radius: 8px; background: #fdfdfd;">
+                    <div style="font-weight: 600; font-size: 1.5rem; margin-bottom: 10px;">Khu vực giao hàng mới</div>
+                    <textarea id="swal-street" class="form-control" style="font-size: 1.5rem; padding: 10px;" rows="2" placeholder="Nhập địa chỉ giao hàng chi tiết (VD: Số 1, Đường X, Phường Y, Quận Z, TP. T)"></textarea>
+                    <button id="btn-cancel-new-addr" type="button" class="btn btn-sm btn-outline-secondary mt-3" onclick="
+                        document.getElementById('new-address-section').style.display = 'none';
+                        if(document.getElementById('address-selection-container')) document.getElementById('address-selection-container').style.display = 'block';
+                        document.getElementById('swal-is-new-address').value = 'false';
+                    ">Hủy thêm mới</button>
+                </div>
+                <input type="hidden" id="swal-is-new-address" value="${addresses.length > 0 ? 'false' : 'true'}">
+            `;
+            
             if (addresses && addresses.length > 0) {
                 addressSelectHtml = `
-                    <select id="swal-select-address" class="form-select mt-2" onchange="document.getElementById('swal-input-address').value = this.value">
-                        <option value="">-- Chọn địa chỉ đã lưu --</option>
-                        ${addresses.map((addr: any) => `<option value="${addr.addressLine}">${addr.addressLine}</option>`).join('')}
-                    </select>
+                    <div id="address-selection-container">
+                        <select id="swal-select-address" class="form-select mt-2 mb-2" style="font-size: 1.5rem; padding: 10px;">
+                            ${addresses.map((addr: any) => {
+                                const line = addr.addressLine || addr.address_line;
+                                const isDef = addr.isDefault || addr.is_default;
+                                return `<option value="${line}" ${isDef ? 'selected' : ''}>${line} ${isDef ? '(Mặc định)' : ''}</option>`;
+                            }).join('')}
+                        </select>
+                        <button type="button" class="btn btn-outline-primary mt-1" style="font-size: 1.3rem;" onclick="
+                            document.getElementById('new-address-section').style.display = 'block';
+                            document.getElementById('address-selection-container').style.display = 'none';
+                            document.getElementById('swal-is-new-address').value = 'true';
+                        "><i class="fas fa-plus"></i> Thêm địa chỉ mới</button>
+                    </div>
                 `;
+            } else {
+                addressSelectHtml = `<div class="alert alert-info mt-2 mb-2" style="font-size: 1.3rem;">Bạn chưa có địa chỉ lưu sẵn. Hãy thêm địa chỉ bên dưới, hệ thống sẽ tự động lưu lại.</div>`;
+                addressInputHtml = addressInputHtml.replace('display: none;', 'display: block;');
+                addressInputHtml = addressInputHtml.replace('id="btn-cancel-new-addr"', 'id="btn-cancel-new-addr" style="display:none;"');
             }
 
             // Let's prompt user using Swal
@@ -241,15 +278,14 @@ const CartPage: React.FC = () => {
                         </div>
                         <div class="mb-3">
                             <label class="form-label" style="font-weight: 600; font-size: 1.6rem;">Địa chỉ giao hàng</label>
-                            <textarea id="swal-input-address" class="form-control" style="font-size: 1.5rem; padding: 10px;" rows="2" placeholder="Nhập địa chỉ giao hàng">${defaultAddress}</textarea>
                             ${addressSelectHtml}
+                            ${addressInputHtml}
                         </div>
                         <div class="mb-3">
                             <label class="form-label" style="font-weight: 600; font-size: 1.6rem;">Phương thức thanh toán</label>
                             <select id="swal-input-payment" class="form-select" style="font-size: 1.5rem; padding: 10px; height: auto;">
-                                <option value="CASH">Tiền mặt (COD)</option>
-                                <option value="CARD">Thẻ ngân hàng</option>
-                                <option value="EWALLET">Ví điện tử</option>
+                                <option value="CASH">Thanh toán khi nhận hàng (COD)</option>
+                                <option value="VNPAY">Thanh toán qua VNPay</option>
                             </select>
                         </div>
                     </div>
@@ -259,14 +295,30 @@ const CartPage: React.FC = () => {
                 confirmButtonText: 'Đặt hàng ngay',
                 cancelButtonText: 'Hủy',
                 confirmButtonColor: '#512a10',
+
                 preConfirm: () => {
                     const rName = (document.getElementById('swal-input-name') as HTMLInputElement).value;
                     const rPhone = (document.getElementById('swal-input-phone') as HTMLInputElement).value;
-                    const rAddress = (document.getElementById('swal-input-address') as HTMLTextAreaElement).value;
                     const rPayment = (document.getElementById('swal-input-payment') as HTMLSelectElement).value;
 
+                    const isNewAddress = (document.getElementById('swal-is-new-address') as HTMLInputElement).value === 'true';
+                    let rAddress = "";
+                    
+                    if (isNewAddress) {
+                        const street = (document.getElementById('swal-street') as HTMLTextAreaElement).value;
+                        
+                        if (!street) {
+                            Swal.showValidationMessage('Vui lòng nhập chi tiết địa chỉ giao hàng');
+                            return false;
+                        }
+                        rAddress = street;
+                    } else {
+                        const sel = document.getElementById('swal-select-address') as HTMLSelectElement;
+                        if (sel && sel.value) rAddress = sel.value;
+                    }
+
                     if (!rName || !rPhone || !rAddress) {
-                        Swal.showValidationMessage('Vui lòng điền đầy đủ họ tên, số điện thoại và địa chỉ giao hàng!');
+                        Swal.showValidationMessage('Vui lòng điền đầy đủ thông tin giao hàng!');
                         return false;
                     }
 
@@ -292,8 +344,9 @@ const CartPage: React.FC = () => {
                 items: orderItems
             };
 
+
             // Post order creation
-            await axios.post(`http://localhost:8082/customer/${cId}/orders`, orderPayload, {
+            const orderResponse = await axios.post(`http://localhost:8082/customer/${cId}/orders`, orderPayload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -301,6 +354,22 @@ const CartPage: React.FC = () => {
             await axios.delete(`${API_BASE_URL}/cart/clear`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            if (formValues.paymentMethod === 'VNPAY') {
+                const orderId = orderResponse.data?.data?.orderId;
+                if (orderId) {
+                    const vnpayResponse = await axios.get(`http://localhost:8082/api/payment/vnpay/create-url?orderId=${orderId}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+
+                    if (vnpayResponse.data.success && vnpayResponse.data.data) {
+                        window.location.href = vnpayResponse.data.data;
+                        return; // Halt execution and let browser redirect
+                    } else {
+                        showToast("Không thể tạo URL thanh toán, bạn có thể thanh toán sau", "error");
+                    }
+                }
+            }
 
             await Swal.fire({
                 icon: 'success',
@@ -569,12 +638,12 @@ const CartPage: React.FC = () => {
                                             <span style={{ fontWeight: 'bold', fontSize: '1.4rem', color: '#27ae60', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <i className="fas fa-check-circle" style={{ fontSize: '1.6rem' }}></i> {code}
                                             </span>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => {
                                                     quickRemove(code);
                                                     setTimeout(() => fetchCoupons(), 300);
-                                                }} 
+                                                }}
                                                 style={{ background: '#c0392b', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', transition: 'background-color 0.2s' }}
                                             >
                                                 Huỷ áp dụng
@@ -692,4 +761,4 @@ const CartPage: React.FC = () => {
     );
 };
 
-export default CartPage;
+export default CartPage;

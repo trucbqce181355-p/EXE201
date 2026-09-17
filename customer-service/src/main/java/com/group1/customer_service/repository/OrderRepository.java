@@ -35,6 +35,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Pageable pageable
     );
 
+    Optional<Order> findByOrderNumber(String orderNumber);
+
+    @Query("""
+        SELECT o FROM Order o
+        WHERE (:status IS NULL OR o.status IN :status)
+        AND (:fromDate IS NULL OR o.createdAt >= :fromDate)
+        AND (:toDate IS NULL OR o.createdAt <= :toDate)
+    """)
+    Page<Order> filterAllOrders(
+            @Param("status") List<String> status,
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate,
+            Pageable pageable
+    );
+
     @Query("""
         SELECT o FROM Order o
         LEFT JOIN FETCH o.items

@@ -139,6 +139,11 @@ function AdminLayout() {
             Roles
           </NavLink>
 
+          <NavLink to="/admin/orders" className={({ isActive }) => isActive ? "active" : ""}>
+            <i className="fas fa-shopping-cart" style={{ width: "20px", marginRight: "10px" }}></i>
+            Orders
+          </NavLink>
+
           <NavLink to="/admin/segments" className={({ isActive }) => isActive ? "active" : ""}>
             <i className="fas fa-users-cog" style={{ width: "20px", marginRight: "10px" }}></i>
             Customer Segments
